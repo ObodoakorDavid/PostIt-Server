@@ -9,9 +9,8 @@ class User(AbstractUser):
     email = models.EmailField(verbose_name='email',
                               max_length=225, unique=True)
     is_admin = models.BooleanField(default=False)
-    REQUIRED_FIELDS = ('username', 'first_name', 'is_admin')
+    REQUIRED_FIELDS = ('username', 'first_name')
     USERNAME_FIELD = 'email'
-
     def get_username(self):
         return self.email
     

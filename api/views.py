@@ -7,8 +7,19 @@ from datetime import datetime
 from .serialiazers import StoriesSerializer
 from .models import Stories
 
-
 # Create your views here.
+
+@api_view(['GET'])
+def get_routes(request):
+    context = {
+        "/api/v1/": "All Routes",
+        "/api/v1/stories": "All Stories",
+        "/api/v1/auth/users/": "Register User",
+        "/api/v1/auth/users/me": "Current User",
+        "/api/v1/auth/token/login": "LogIn User",
+        "/api/v1/auth/token/logout": "LogOut User",
+    }
+    return Response(context, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -22,6 +33,31 @@ def all_stories(request, *args, **kwargs):
     serializer = StoriesSerializer(stories, many=True)
     print(serializer.data)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def create_story(request):
+    story = request.data
+    author = request.user
+    serializer = StoriesSerializer(data=story, many=False)
+    if serializer.is_valid():
+        serializer.save(author=author)
+        print(serializer.data)
+        return Response({
+            'status': True, 
+            'message': 'Story Created'
+        }, status=status.HTTP_201_CREATED)
+    else:
+        return Response({
+            'status': False, 
+            'message': 'Check The Fields'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    
+    
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

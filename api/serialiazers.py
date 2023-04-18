@@ -7,7 +7,8 @@ class UserSerialiazer(UserCreateSerializer):
     class Meta(UserCreateSerializer.Meta):
         model = User
         fields = ('id', 'username', 'password', 'first_name',
-                  'last_name', 'phone', 'is_admin')
+                  'last_name', 'is_admin')
+        # depth = 1
         
 class StoriesSerializer(serializers.ModelSerializer):
     class Meta:
