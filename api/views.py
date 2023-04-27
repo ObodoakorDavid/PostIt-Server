@@ -13,11 +13,13 @@ from .models import Stories
 def get_routes(request):
     context = {
         "/api/v1/": "All Routes",
-        "/api/v1/stories": "All Stories",
+        "/api/v1/stories/": "All Stories",
+        "/api/v1/stories/": "Create Stories",
+        "/api/v1/stories/user/": "User Stories",
         "/api/v1/auth/users/": "Register User",
-        "/api/v1/auth/users/me": "Current User",
-        "/api/v1/auth/token/login": "LogIn User",
-        "/api/v1/auth/token/logout": "LogOut User",
+        "/api/v1/auth/users/me/": "Current User",
+        "/api/v1/auth/token/login/": "LogIn User",
+        "/api/v1/auth/token/logout/": "LogOut User",
     }
     return Response(context, status=status.HTTP_200_OK)
 
@@ -31,6 +33,14 @@ def restricted_view(request, *args, **kwargs):
 def all_stories(request, *args, **kwargs):
     stories = Stories.objects.all()
     serializer = StoriesSerializer(stories, many=True)
+    print(serializer.data)
+    return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_stories(request):
+    all_user_stories = Stories.objects.filter(author=request.user)
+    serializer = StoriesSerializer(all_user_stories, many=True)
     print(serializer.data)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
@@ -48,10 +58,34 @@ def create_story(request):
             'message': 'success'
         }, status=status.HTTP_201_CREATED)
     else:
+        print('error', serializer.errors)
         return Response({
             'status': False, 
             'message': 'failed'
         }, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def single_story(request):
+    return Response({'msg': 'ok'})
+    # story = request.data
+    # author = request.user
+    # serializer = StoriesSerializer(data=story, many=False)
+    # if serializer.is_valid():
+    #     serializer.save(author=author)
+    #     print(serializer.data)
+    #     return Response({
+    #         'status': True, 
+    #         'message': 'success'
+    #     }, status=status.HTTP_201_CREATED)
+    # else:
+    #     print('error', serializer.errors)
+    #     return Response({
+    #         'status': False, 
+    #         'message': 'failed'
+    #     }, status=status.HTTP_400_BAD_REQUEST)
+    
+
 
 
 @api_view(['GET'])
