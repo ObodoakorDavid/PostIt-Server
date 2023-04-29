@@ -11,6 +11,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False)
     REQUIRED_FIELDS = ('username',)
     USERNAME_FIELD = 'email'
+
     def get_username(self):
         return self.email
     
@@ -23,3 +24,5 @@ class Stories(models.Model):
 
     def __str__(self):
         return self.title
+    
+
