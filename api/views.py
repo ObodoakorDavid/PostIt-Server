@@ -30,7 +30,7 @@ def restricted_view(request, *args, **kwargs):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def all_stories(request, *args, **kwargs):
+def all_stories(request):
     stories = Stories.objects.all()
     serializer = StoriesSerializer(stories, many=True)
     print(serializer.data)
@@ -52,7 +52,7 @@ def create_story(request):
     serializer = StoriesSerializer(data=story, many=False)
     if serializer.is_valid():
         serializer.save(author=author)
-        print(serializer.data)
+        # print(serializer.data)
         return Response({
             'status': True, 
             'message': 'success'
@@ -64,26 +64,34 @@ def create_story(request):
             'message': 'failed'
         }, status=status.HTTP_400_BAD_REQUEST)
     
-@api_view(['GET', 'PUT'])
+
+@api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def single_story(request):
-    return Response({'msg': 'ok'})
-    # story = request.data
-    # author = request.user
-    # serializer = StoriesSerializer(data=story, many=False)
-    # if serializer.is_valid():
-    #     serializer.save(author=author)
-    #     print(serializer.data)
-    #     return Response({
-    #         'status': True, 
-    #         'message': 'success'
-    #     }, status=status.HTTP_201_CREATED)
-    # else:
-    #     print('error', serializer.errors)
-    #     return Response({
-    #         'status': False, 
-    #         'message': 'failed'
-    #     }, status=status.HTTP_400_BAD_REQUEST)
+def single_story(request, id):
+    story = Stories.objects.get(id=id)
+    if request.method == 'GET':
+        serializer = StoriesSerializer(story, many=False)
+        return Response(data=serializer.data)
+    elif request.method == 'PUT':
+        serializer = StoriesSerializer(instance=story, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+            'status': True, 
+            'message': 'success'
+        }, status=status.HTTP_202_ACCEPTED)
+        else:
+            print(serializer.errors)
+            return Response({
+            'status': False, 
+            'message': 'failed'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        story.delete()
+        return Response({ 
+            'status': True,
+            'message': 'Story Deleted Successfully'
+            }, status=status.HTTP_200_OK)
     
 
 
