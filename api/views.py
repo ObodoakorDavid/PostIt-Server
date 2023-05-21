@@ -96,10 +96,12 @@ def single_story(request, id):
 
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def test(request):
     date = datetime.now()
     print(date)
+    print(request.FILES)
+    print(request.data)
     return Response(
         {
             "working": True,
