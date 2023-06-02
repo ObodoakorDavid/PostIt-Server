@@ -11,6 +11,7 @@ class UserSerialiazer(UserCreateSerializer):
         # depth = 1
         
 class StoriesSerializer(serializers.ModelSerializer):
+    # image_url = serializers.ImageField(required=False)
     class Meta:
         model = Stories
         fields = '__all__'

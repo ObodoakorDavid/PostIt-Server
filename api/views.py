@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, APIView, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from datetime import datetime
 from .serialiazers import StoriesSerializer
 from .models import Stories
+
+from rest_framework.parsers import MultiPartParser, JSONParser
 
 # Create your views here.
 
@@ -46,13 +48,14 @@ def user_stories(request):
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
+# @parser_classes([MultiPartParser, JSONParser])
 def create_story(request):
     story = request.data
     author = request.user
     serializer = StoriesSerializer(data=story, many=False)
     if serializer.is_valid():
         serializer.save(author=author)
-        # print(serializer.data)
+        print(serializer.data)
         return Response({
             'status': True, 
             'message': 'success'
@@ -63,6 +66,37 @@ def create_story(request):
             'status': False, 
             'message': 'failed'
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class create_story(APIView):
+#     permission_classes = [AllowAny]
+#     serializer_class = StoriesSerializer
+
+#     def post(self, request):
+#         story = request.data
+#         image = request.FILES.get('image_url')
+#         print(request.data)
+#         print(request.method)
+#         print(request.FILES.get('image_url'))
+#         for filename, file in request.FILES.items():
+#             print(filename, file)
+#         # return ({'hi': 'hi'})
+#         # author = request.user
+#         serializer = StoriesSerializer(data=story, many=False)
+#         if serializer.is_valid():
+#             # serializer.save(author=author, image_url=image )
+#             # print(serializer.data)
+#             return Response({
+#                 'status': True, 
+#                 'message': 'success'
+#             }, status=status.HTTP_201_CREATED)
+#         else:
+#             print('error', serializer.errors)
+#             return Response({
+#                 'status': False, 
+#                 'message': 'failed'
+#             }, status=status.HTTP_400_BAD_REQUEST)
+        
     
 
 @api_view(['GET', 'PUT', 'DELETE'])
